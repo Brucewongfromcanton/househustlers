@@ -12,9 +12,9 @@ data = pd.read_csv('Custom_Data.csv')
 # Load cleaned population data (Replace with the correct CSV file path)
 pop_data = pd.read_csv('Forecast_Pop_By_Area.csv')
 
-# Extract population data for the City of Boroondara
-pop_years = [2021, 2026, 2031, 2036, 2041, 2046]  # Years in the population data
-population_boroondara = pop_data.loc[pop_data['Area'] == 'City of Boroondara'].values[0][1:7].astype(float)
+# Extract population data for the City of Boroondara, limited to the years 2021, 2026, 2031
+pop_years = [2021, 2026, 2031]  # Limit to years up to 2031
+population_boroondara = pop_data.loc[pop_data['Area'] == 'City of Boroondara', ['2021', '2026', '2031']].values[0].astype(float)
 
 # Use Year as the feature for time series predictions
 X = data[['Year']]  # Features: only the Year
@@ -74,7 +74,7 @@ def train_predict_decision_tree(X_train, X_test, y_train, y_test, label):
     ax1.tick_params(axis='y', labelcolor='red')
     ax1.legend(loc='upper left')
 
-    # Plot population growth on the secondary y-axis
+    # Plot population growth on the secondary y-axis (up to 2031)
     ax2 = ax1.twinx()
     ax2.plot(pop_years, population_boroondara, color='green', label='Population Growth (Boroondara)', linestyle='-.')
     ax2.set_ylabel('Population', color='green')

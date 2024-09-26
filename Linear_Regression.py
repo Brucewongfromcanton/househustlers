@@ -9,12 +9,13 @@ import matplotlib.pyplot as plt
 # Load dataset for house prices and rents (Replace with the correct CSV file path)
 data = pd.read_csv('Custom_Data.csv')
 
-# Load cleaned population data (Replace with the correct CSV file path)
+# Load the population data (Replace with the correct CSV file path)
 pop_data = pd.read_csv('Forecast_Pop_By_Area.csv')
 
-# Extract population data for the City of Boroondara
-pop_years = [2021, 2026, 2031, 2036, 2041, 2046]  # Years in the population data
-population_boroondara = pop_data.loc[pop_data['Area'] == 'City of Boroondara'].values[0][1:7].astype(float)
+
+# Limit population data to years up to 2031 for the City of Boroondara
+pop_years = [2021, 2026, 2031]  # Only use population data up to 2031
+population_boroondara = pop_data.loc[pop_data['Area'] == 'City of Boroondara', ['2021', '2026', '2031']].values[0]
 
 # Use Year as the feature for time series predictions
 X = data[['Year']]  # Features: only the Year
@@ -27,11 +28,13 @@ y_mRent_Unit = data['mRent_Unit']
 y_cRent_House = data['cRent_House']
 y_cRent_Unit = data['cRent_Unit']
 
+
+
 # Split the data into training and testing sets
 def split_data(X, y):
     return train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Function to train and predict, and plot with population growth
+# Function to train and predict, and plot with population growth and additional data
 def train_predict(X_train, X_test, y_train, y_test, label):
     # Initialize and train the model
     model = LinearRegression()
@@ -63,7 +66,7 @@ def train_predict(X_train, X_test, y_train, y_test, label):
     # Print metrics
     print(f"{label} Prediction - RMSE: {rmse}, MAE: {mae}")
 
-    # Create a dual-axis plot: House prices and population growth
+    # Create a dual-axis plot: House prices, population growth, and additional metrics
     fig, ax1 = plt.subplots(figsize=(10, 6))
 
     # Plot historical and predicted house prices
@@ -79,16 +82,16 @@ def train_predict(X_train, X_test, y_train, y_test, label):
     ax2.plot(pop_years, population_boroondara, color='green', label='Population Growth (Boroondara)', linestyle='-.')
     ax2.set_ylabel('Population', color='green')
     ax2.tick_params(axis='y', labelcolor='green')
-    ax2.legend(loc='upper right')
+
 
     # Set the title and show the plot
-    plt.title(f'{label} Prediction and Population Growth (City of Boroondara)')
+    plt.title(f'{label} Prediction and Additional Data')
     plt.grid(True)
     plt.show()
 
     return model
 
-# Run predictions for each target (Median House Prices, Sales Volumes, etc.) with population growth
+# Run predictions for each target (Median House Prices, Sales Volumes, etc.) with population growth and additional data
 
 # Predict Median House Prices and visualize population growth
 X_train, X_test, y_train, y_test = split_data(X, y_mBuy_House)
