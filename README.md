@@ -20,6 +20,15 @@ Make sure these files are correctly named and placed in the root of the project 
 
 ## Model Training:
 The models used in this project are **Linear Regression**, **KNN Regressor**, and **Decision Tree Regressor**. Each model is trained on the Year feature, and predictions are made for future years (up to 2028).
+Here's the comparison between the three models in a table format:
+
+| **Model**                  | **Description**                                                                 | **Advantages**                                                                                         | **Disadvantages**                                                                                        |
+|----------------------------|---------------------------------------------------------------------------------|---------------------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------|
+| **Linear Regression**       | Assumes a linear relationship between input (Year) and output (house prices).   | - Simple and easy to interpret. <br> - Efficient for linear trends.                                      | - Struggles with non-linear patterns (underfitting). <br> - Sensitive to outliers.                       |
+| **KNN Regressor**           | Predicts values based on the k-nearest neighbors in the feature space.           | - Captures non-linear relationships. <br> - Simple to understand. <br> - Adaptable to complex datasets.  | - Requires feature normalization. <br> - Computationally expensive for large datasets. <br> - Sensitive to noisy data. |
+| **Decision Tree Regressor** | Recursively splits data based on input to predict target values.                | - Handles non-linear relationships well. <br> - Robust to outliers. <br> - Easy to visualize and interpret. | - Prone to overfitting. <br> - High variance. <br> - Can become complex for large datasets.              |
+
+This table summarises the key aspects of each model for easier comparison. Let me know if you'd like any further adjustments!
 
 ### Model Parameters
 The following parameters can be customized directly in the scripts:
