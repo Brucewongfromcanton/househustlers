@@ -3,15 +3,15 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.linear_model import LinearRegression
-from sklearn.metrics import mean_squared_error, mean_absolute_error
+from sklearn.preprocessing import StandardScaler
+from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import matplotlib.pyplot as plt
 
 # Load dataset for house prices and rents (Replace with the correct CSV file path)
-data = pd.read_csv('Custom_Data.csv')
+data = pd.read_csv('Housing_Data.csv')
 
 # Load the population data (Replace with the correct CSV file path)
 pop_data = pd.read_csv('Forecast_Pop_By_Area.csv')
-
 
 # Limit population data to years up to 2031 for the City of Boroondara
 pop_years = [2021, 2026, 2031]  # Only use population data up to 2031
@@ -28,43 +28,46 @@ y_mRent_Unit = data['mRent_Unit']
 y_cRent_House = data['cRent_House']
 y_cRent_Unit = data['cRent_Unit']
 
-
-
 # Split the data into training and testing sets
 def split_data(X, y):
     return train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Function to train and predict, and plot with population growth and additional data
+# Function to train and predict, normalize features, and plot with population growth and additional data
 def train_predict(X_train, X_test, y_train, y_test, label):
+    # Normalize the features using StandardScaler
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    X_scaled = scaler.transform(X)
+
     # Initialize and train the model
     model = LinearRegression()
-    model.fit(X_train, y_train)
+    model.fit(X_train_scaled, y_train)
 
     # Predict on test data
-    y_pred = model.predict(X_test)
+    y_pred = model.predict(X_test_scaled)
 
     # Predict on the entire historical dataset
-    y_all_pred = model.predict(X)
+    y_all_pred = model.predict(X_scaled)
 
     # Extend the year range up to 2028 for future predictions
     future_years = pd.DataFrame({'Year': range(X['Year'].max() + 1, 2029)})
-    
-    # Ensure future_years has the same column name as X (even if it's just 'Year')
-    future_years.columns = X.columns
-    
+    future_years_scaled = scaler.transform(future_years)
+
     # Predict for the future years (from the latest year in the dataset to 2028)
-    future_predictions = model.predict(future_years)
+    future_predictions = model.predict(future_years_scaled)
 
     # Combine historical and future data for plotting
     all_years = pd.concat([X, future_years], ignore_index=True)
     all_predictions = np.concatenate([y_all_pred, future_predictions])
 
-    # Calculate performance metrics: RMSE and MAE
+    # Calculate performance metrics: RMSE, MAE, and R² score
     rmse = np.sqrt(mean_squared_error(y_test, y_pred))
     mae = mean_absolute_error(y_test, y_pred)
+    r2 = r2_score(y_test, y_pred)
 
     # Print metrics
-    print(f"{label} Prediction - RMSE: {rmse}, MAE: {mae}")
+    print(f"{label} Prediction - RMSE: {rmse}, MAE: {mae}, R2: {r2}")
 
     # Create a dual-axis plot: House prices, population growth, and additional metrics
     fig, ax1 = plt.subplots(figsize=(10, 6))
@@ -82,7 +85,6 @@ def train_predict(X_train, X_test, y_train, y_test, label):
     ax2.plot(pop_years, population_boroondara, color='green', label='Population Growth (Boroondara)', linestyle='-.')
     ax2.set_ylabel('Population', color='green')
     ax2.tick_params(axis='y', labelcolor='green')
-
 
     # Set the title and show the plot
     plt.title(f'{label} Prediction and Additional Data')

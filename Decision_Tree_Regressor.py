@@ -3,14 +3,19 @@ import pandas as pd
 import numpy as np
 from sklearn.model_selection import train_test_split
 from sklearn.tree import DecisionTreeRegressor
+from sklearn.preprocessing import StandardScaler
 from sklearn.metrics import mean_squared_error, mean_absolute_error
 import matplotlib.pyplot as plt
 
+# ------------------------------ Data Loading -----------------------------------
+
 # Load dataset for house prices and rents (Replace with the correct CSV file path)
-data = pd.read_csv('Custom_Data.csv')
+data = pd.read_csv('Housing_Data.csv')
 
 # Load cleaned population data (Replace with the correct CSV file path)
 pop_data = pd.read_csv('Forecast_Pop_By_Area.csv')
+
+# ------------------------------ Data Processing -----------------------------------
 
 # Extract population data for the City of Boroondara, limited to the years 2021, 2026, 2031
 pop_years = [2021, 2026, 2031]  # Limit to years up to 2031
@@ -27,30 +32,38 @@ y_mRent_Unit = data['mRent_Unit']
 y_cRent_House = data['cRent_House']
 y_cRent_Unit = data['cRent_Unit']
 
+# ------------------------------ Data Splitting Function -----------------------------------
+
 # Split the data into training and testing sets
 def split_data(X, y):
     return train_test_split(X, y, test_size=0.2, random_state=42)
 
-# Function to train and predict using Decision Tree Regressor, and plot with population growth
+# ------------------------------ Decision Tree Training and Prediction Function with Normalization -----------------------------------
+
+# Function to train and predict using Decision Tree Regressor, with normalization, and plot with population growth
 def train_predict_decision_tree(X_train, X_test, y_train, y_test, label):
+    # Normalize the features using StandardScaler
+    scaler = StandardScaler()
+    X_train_scaled = scaler.fit_transform(X_train)
+    X_test_scaled = scaler.transform(X_test)
+    X_scaled = scaler.transform(X)
+
     # Initialize and train the Decision Tree model
     model = DecisionTreeRegressor(random_state=42)
-    model.fit(X_train, y_train)
+    model.fit(X_train_scaled, y_train)
 
     # Predict on test data
-    y_pred = model.predict(X_test)
+    y_pred = model.predict(X_test_scaled)
 
     # Predict on the entire historical dataset
-    y_all_pred = model.predict(X)
+    y_all_pred = model.predict(X_scaled)
 
     # Extend the year range up to 2028 for future predictions
     future_years = pd.DataFrame({'Year': range(X['Year'].max() + 1, 2029)})
-    
-    # Ensure future_years has the same column name as X (even if it's just 'Year')
-    future_years.columns = X.columns
-    
+    future_years_scaled = scaler.transform(future_years)
+
     # Predict for the future years (from the latest year in the dataset to 2028)
-    future_predictions = model.predict(future_years)
+    future_predictions = model.predict(future_years_scaled)
 
     # Combine historical and future data for plotting
     all_years = pd.concat([X, future_years], ignore_index=True)
@@ -62,6 +75,8 @@ def train_predict_decision_tree(X_train, X_test, y_train, y_test, label):
 
     # Print metrics
     print(f"{label} Decision Tree Prediction - RMSE: {rmse}, MAE: {mae}")
+
+    # ------------------------------ Plotting Results -----------------------------------
 
     # Create a dual-axis plot: House prices and population growth
     fig, ax1 = plt.subplots(figsize=(10, 6))
@@ -88,7 +103,7 @@ def train_predict_decision_tree(X_train, X_test, y_train, y_test, label):
 
     return model
 
-# Run predictions for each target (Median House Prices, Sales Volumes, etc.) with population growth
+# ------------------------------ Run predictions for each target ----------------------------------------------------
 
 # Predict Median House Prices and visualize population growth
 X_train, X_test, y_train, y_test = split_data(X, y_mBuy_House)
