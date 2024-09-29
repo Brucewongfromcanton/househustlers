@@ -132,7 +132,6 @@ Here's the updated comparison between the models in a table format:
 | **Decision Tree Regressor**  | Recursively splits data based on input to predict target values.                | - Handles non-linear relationships well. <br> - Robust to outliers. <br> - Easy to visualize and interpret. | - Prone to overfitting. <br> - High variance. <br> - Can become complex for large datasets.                |
 | **Random Forest Classifier** | Combines multiple decision trees to categorise data (e.g., price categories).   | - Reduces overfitting compared to a single decision tree. <br> - Can handle complex, non-linear data.       | - Requires large amounts of data for accurate classification. <br> - Less interpretable compared to simpler models. |
 
-This table summarizes the key aspects of each model for easier comparison. Let me know if you'd like any further adjustments!
 
 ### Model Parameters
 
