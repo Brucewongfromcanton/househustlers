@@ -1,16 +1,15 @@
 # main.py
 
-from fastapi import FastAPI, HTTPException, Depends
+from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
+from pydantic import BaseModel
 from model import CombinedModel  # Import from model.py
 
-# Initialize the FastAPI app with lifespan handler
 app = FastAPI()
 
-# Enable CORS to allow frontend to communicate with the backend
 app.add_middleware(
     CORSMiddleware,
-    allow_origins=["*"],  # Allow all origins
+    allow_origins=["*"],
     allow_credentials=True,
     allow_methods=["*"],
     allow_headers=["*"],
@@ -19,7 +18,6 @@ app.add_middleware(
 # Initialize the CombinedModel globally
 model = CombinedModel()
 
-# Lifespan event to train models on startup
 @app.on_event("startup")
 async def on_startup():
     print("Training models...")
@@ -31,7 +29,6 @@ async def on_startup():
 async def get_housing_data(model_type: str, category: str):
     if model_type not in ["linear", "decision_tree"]:
         raise HTTPException(status_code=400, detail="Invalid model type. Use 'linear' or 'decision_tree'.")
-
     try:
         predictions = model.get_predictions(model_type, category)
         return {"data": predictions}
@@ -47,7 +44,50 @@ async def get_population_data(suburb: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving population data: {str(e)}")
 
-# Main entry point to run the application
+# Custom prediction request model
+class CustomPredictionRequest(BaseModel):
+    year: int
+    property_type: str  # "house" or "unit"
+    transaction_type: str  # "buy" or "rent"
+    value_type: str  # "price" or "count"
+
+# Custom prediction endpoint
+@app.post("/custom_prediction")
+async def custom_prediction(request: CustomPredictionRequest):
+    try:
+        property_type = request.property_type.lower()
+        transaction_type = request.transaction_type.lower()
+        value_type = request.value_type.lower()
+
+        category_map = {
+            ("house", "buy", "price"): "mBuy_House",
+            ("house", "buy", "count"): "cBuy_House",
+            ("house", "rent", "price"): "mRent_House",
+            ("house", "rent", "count"): "cRent_House",
+            ("unit", "buy", "price"): "mBuy_Unit",
+            ("unit", "buy", "count"): "cBuy_Unit",
+            ("unit", "rent", "price"): "mRent_Unit",
+            ("unit", "rent", "count"): "cRent_Unit",
+        }
+
+        category = category_map.get((property_type, transaction_type, value_type))
+        
+        if not category:
+            raise HTTPException(status_code=400, detail="Invalid input combination for prediction")
+
+        linear_prediction = model.get_custom_prediction("linear", category, request.year)
+        decision_tree_prediction = model.get_custom_prediction("decision_tree", category, request.year)
+
+        return {
+            "year": request.year,
+            "category": category,
+            "linear_prediction": linear_prediction,
+            "decision_tree_prediction": decision_tree_prediction
+        }
+
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error generating prediction: {str(e)}")
+
 if __name__ == "__main__":
     import uvicorn
     uvicorn.run(app, host="0.0.0.0", port=8000)

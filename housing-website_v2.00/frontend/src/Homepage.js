@@ -2,7 +2,7 @@
 
 import React, { useState, useEffect } from 'react';
 import { LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer } from 'recharts';
-import { Container, Typography, Paper, Box, MenuItem, FormControl, Select, InputLabel, Grid } from '@mui/material';
+import { Container, Typography, Paper, Box, MenuItem, FormControl, Select, InputLabel, TextField, Button } from '@mui/material';
 import axios from 'axios';
 import Header from './Header';
 import banner from './banner.jpg';
@@ -12,23 +12,22 @@ const HomePage = () => {
   const [boroondaraData, setBoroondaraData] = useState([]);
   const [suburbData, setSuburbData] = useState([]);
   const [selectedSuburb, setSelectedSuburb] = useState('City of Boroondara');
-  const [selectedCategory, setSelectedCategory] = useState('mBuy_House'); // Default category
-  const [loading, setLoading] = useState(false); // Loading state for housing data
+  const [selectedCategory, setSelectedCategory] = useState('mBuy_House');
+  const [loading, setLoading] = useState(false);
+  
+  const [year, setYear] = useState('');
+  const [propertyType, setPropertyType] = useState('house');
+  const [transactionType, setTransactionType] = useState('buy');
+  const [valueType, setValueType] = useState('price');
+  const [predictionResult, setPredictionResult] = useState(null);
 
   // Fetch housing data with predictions from both models
   useEffect(() => {
     const fetchHousingData = async () => {
       try {
         setLoading(true);
-        const linearResponse = await axios.get(
-          `http://localhost:8000/housing_data?model_type=linear&category=${selectedCategory}`
-        );
-        const decisionTreeResponse = await axios.get(
-          `http://localhost:8000/housing_data?model_type=decision_tree&category=${selectedCategory}`
-        );
-
-        console.log('Linear Response:', linearResponse.data);
-        console.log('Decision Tree Response:', decisionTreeResponse.data);
+        const linearResponse = await axios.get(`http://localhost:8000/housing_data?model_type=linear&category=${selectedCategory}`);
+        const decisionTreeResponse = await axios.get(`http://localhost:8000/housing_data?model_type=decision_tree&category=${selectedCategory}`);
 
         setHousingData({
           linear: linearResponse.data.data || linearResponse.data,
@@ -48,10 +47,7 @@ const HomePage = () => {
   useEffect(() => {
     const fetchPopulationData = async () => {
       try {
-        const response = await axios.get(
-          `http://localhost:8000/population_data?suburb=${selectedSuburb}`
-        );
-        console.log('Population Data:', response.data);
+        const response = await axios.get(`http://localhost:8000/population_data?suburb=${selectedSuburb}`);
         setBoroondaraData(response.data.Boroondara);
         setSuburbData(response.data.Suburb);
       } catch (error) {
@@ -67,6 +63,21 @@ const HomePage = () => {
 
   const handleSuburbChange = (event) => {
     setSelectedSuburb(event.target.value);
+  };
+
+  // Custom prediction handler
+  const handlePredict = async () => {
+    try {
+      const response = await axios.post("http://localhost:8000/custom_prediction", {
+        year: parseInt(year),
+        property_type: propertyType,
+        transaction_type: transactionType,
+        value_type: valueType
+      });
+      setPredictionResult(response.data);
+    } catch (error) {
+      console.error("Error fetching prediction:", error);
+    }
   };
 
   return (
@@ -184,9 +195,64 @@ const HomePage = () => {
             </ResponsiveContainer>
           </Paper>
         </Box>
+
+        {/* Custom Prediction Section */}
+        <Box sx={{ my: 6 }}>
+          <Typography variant="h3" align="center" gutterBottom>
+            Custom Prediction
+          </Typography>
+
+          <TextField
+            label="Year"
+            value={year}
+            onChange={(e) => setYear(e.target.value)}
+            type="number"
+            fullWidth
+            margin="normal"
+          />
+
+          <FormControl fullWidth sx={{ my: 2 }}>
+            <InputLabel>Property Type</InputLabel>
+            <Select value={propertyType} onChange={(e) => setPropertyType(e.target.value)}>
+              <MenuItem value="house">House</MenuItem>
+              <MenuItem value="unit">Unit</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth sx={{ my: 2 }}>
+            <InputLabel>Transaction Type</InputLabel>
+            <Select value={transactionType} onChange={(e) => setTransactionType(e.target.value)}>
+              <MenuItem value="buy">Buy</MenuItem>
+              <MenuItem value="rent">Rent</MenuItem>
+            </Select>
+          </FormControl>
+
+          <FormControl fullWidth sx={{ my: 2 }}>
+            <InputLabel>Value Type</InputLabel>
+            <Select value={valueType} onChange={(e) => setValueType(e.target.value)}>
+              <MenuItem value="price">Price</MenuItem>
+              <MenuItem value="count">Count</MenuItem>
+            </Select>
+          </FormControl>
+
+          <Button variant="contained" color="primary" onClick={handlePredict} sx={{ mt: 2 }}>
+            Get Prediction
+          </Button>
+
+          {predictionResult && (
+            <Box sx={{ mt: 4, p: 3, border: '1px solid #ddd', borderRadius: '8px', backgroundColor: '#f9f9f9' }}>
+              <Typography variant="h6">Prediction Results for {predictionResult.year}</Typography>
+              <Typography>Category: {predictionResult.category}</Typography>
+              <Typography>Linear Model Prediction: {predictionResult.linear_prediction}</Typography>
+              <Typography>Decision Tree Prediction: {predictionResult.decision_tree_prediction}</Typography>
+            </Box>
+          )}
+        </Box>
       </Container>
     </div>
   );
 };
 
 export default HomePage;
+
+           
