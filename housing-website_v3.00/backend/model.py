@@ -1,4 +1,4 @@
-# model_with_decision_tree.py
+# model.py
 
 import pandas as pd
 import numpy as np
@@ -7,10 +7,8 @@ from sklearn.tree import DecisionTreeRegressor
 from sklearn.preprocessing import StandardScaler
 import joblib
 
-# model.py
-
 class CombinedModel:
-    def __init__(self, data_path='./backend/Housing_Data.csv', pop_data_path='./backend/Forecast_Pop_By_Area.csv'):
+    def __init__(self, data_path='Housing_Data.csv', pop_data_path='Forecast_Pop_By_Area.csv'):
         self.housing_data = pd.read_csv(data_path)
         self.population_data = pd.read_csv(pop_data_path)
         self.linear_models = {}
@@ -39,21 +37,25 @@ class CombinedModel:
         joblib.dump(self.decision_tree_models, 'decision_tree_models.pkl')
 
     def get_predictions(self, model_type, target):
-        models = joblib.load(f'{model_type}_models.pkl')
-        model_info = models[target]
+        try:
+            models = joblib.load(f'{model_type}_models.pkl')
+            model_info = models[target]
+            print(f"Loaded model for '{target}' under '{model_type}' model type")
+        except KeyError:
+            raise ValueError(f"Model '{target}' not found for model type '{model_type}'")
+
         X = self.housing_data[['Year']].copy()
-        
         if model_type == 'decision_tree':
             model, scaler = model_info
             X_scaled = scaler.transform(X)
         else:
             model = model_info
             X_scaled = X
-        
+
         historical_data = self.housing_data[['Year', target]].rename(columns={target: 'value'})
         max_year = X['Year'].max()
         future_years = pd.DataFrame({'Year': range(max_year + 1, 2029)})
-        
+
         if model_type == 'decision_tree':
             future_years_scaled = scaler.transform(future_years)
             future_predictions = model.predict(future_years_scaled)
@@ -78,3 +80,22 @@ class CombinedModel:
             model = model_info
 
         return model.predict(year_df)[0]
+
+    def get_population_data(self, suburb):
+        if 'Area' not in self.population_data.columns:
+            raise KeyError("Population data is missing 'Area' column")
+
+        suburb_data = self.population_data[self.population_data['Area'] == suburb]
+        boroondara_data = self.population_data[self.population_data['Area'] == 'City of Boroondara']
+
+        if suburb_data.empty:
+            raise KeyError(f"Suburb '{suburb}' not found in population data")
+
+        def format_population(data):
+            years = ['2021', '2026', '2031', '2036', '2041', '2046']
+            return [{'Year': int(year), 'Population': int(data[year].values[0])} for year in years]
+
+        return {
+            'Boroondara': format_population(boroondara_data),
+            'Suburb': format_population(suburb_data)
+        }

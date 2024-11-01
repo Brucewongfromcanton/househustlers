@@ -2,7 +2,7 @@
 
 import React from 'react';
 import { AppBar, Toolbar, Typography, Button, Box } from '@mui/material';
-import { Link as ScrollLink } from 'react-scroll';
+import { Link } from 'react-router-dom';
 
 const Header = () => {
   return (
@@ -12,12 +12,9 @@ const Header = () => {
           Housing Market Tracker
         </Typography>
         <Box>
-          <ScrollLink to="home" smooth={true} duration={500}>
-            <Button color="inherit">Home</Button>
-          </ScrollLink>
-          <ScrollLink to="about" smooth={true} duration={500}>
-            <Button color="inherit">About Me</Button>
-          </ScrollLink>
+          <Button color="inherit" component={Link} to="/">Home</Button>
+          <Button color="inherit" component={Link} to="/recently-sold">Recently Sold</Button>
+          <Button color="inherit" component={Link} to="/#about">About Me</Button>
         </Box>
       </Toolbar>
     </AppBar>

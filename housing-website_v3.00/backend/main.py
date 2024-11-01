@@ -1,9 +1,8 @@
-# main.py
-
 from fastapi import FastAPI, HTTPException
 from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from model import CombinedModel  # Import from model.py
+import pandas as pd
 
 app = FastAPI()
 
@@ -17,6 +16,8 @@ app.add_middleware(
 
 # Initialize the CombinedModel globally
 model = CombinedModel()
+
+listings_df = pd.read_csv('Listings.csv')
 
 @app.on_event("startup")
 async def on_startup():
@@ -44,6 +45,15 @@ async def get_population_data(suburb: str):
     except Exception as e:
         raise HTTPException(status_code=500, detail=f"Error retrieving population data: {str(e)}")
 
+@app.get("/api/recently_sold_listings")
+async def get_recently_sold_listings():
+    try:
+        # Fill NaN values in the DataFrame
+        listings_data = listings_df.fillna("").to_dict(orient="records")
+        return listings_data
+    except Exception as e:
+        raise HTTPException(status_code=500, detail=f"Error retrieving listings data: {str(e)}")
+    
 # Custom prediction request model
 class CustomPredictionRequest(BaseModel):
     year: int
