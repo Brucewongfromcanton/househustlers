@@ -24,6 +24,8 @@ The backend consists of two main files:
 
 ### **Setup Instructions**
 
+To allow users to run the model and make predictions, you can add instructions for running the server along with details on how to execute predictions via the frontend or directly using the backend API. Here’s an expanded README section:
+
 #### **1. Install Dependencies**
 Make sure you have all required packages installed. You can do this by running:
 
@@ -31,16 +33,26 @@ Make sure you have all required packages installed. You can do this by running:
 pip install fastapi uvicorn pandas scikit-learn joblib
 ```
 
-#### **2. Run the Server**
-To start the FastAPI server, navigate to the `backend` directory and run:
+#### **2. Train and Run the Server**
+To train the models and start the FastAPI server, follow these steps:
 
-```bash
-uvicorn main:app --reload
-```
+1. **Train the Model**  
+   In the `backend` directory, you can trigger model training by running:
 
-This will start the backend on `http://localhost:8000`.
+   ```bash
+   python model.py
+   ```
 
----
+   This will create saved model files (`linear_models.pkl` and `decision_tree_models.pkl`), which are necessary for making predictions.
+
+2. **Run the Server**  
+   After training, start the FastAPI server by running:
+
+   ```bash
+   uvicorn main:app --reload
+   ```
+
+   This will start the backend on `http://localhost:8000`.
 
 ### **Backend Structure and Explanation**
 
@@ -123,3 +135,48 @@ This file defines the FastAPI application and sets up various endpoints:
 
 #### **3. Model Training on Startup**
 The `@app.on_event("startup")` decorator in `main.py` triggers the **model training process** each time the FastAPI server starts. This ensures that the models are trained with the latest data and ready for predictions.
+
+## Frontend
+
+The frontend of **House Hustlers** is built with **React** and **Material-UI** to provide a clean and interactive user experience for navigating through housing predictions and population data. The application is structured with components to make data exploration easy, including the ability to customize predictions and view recent listings.
+
+Here’s a breakdown of the main components:
+
+#### **1. Header Component**
+The `Header.js` component creates a navigation bar with links to the main sections of the application:
+- **Home**: The main dashboard for predictions.
+- **Recently Sold**: Displays recently sold listings.
+- **About Us**: A section describing the project and team.
+
+#### **2. HomePage Component**
+The `HomePage.js` component is the primary interface for users to view housing and population data.
+
+Key features include:
+- **Housing Market Predictions**: Users can select categories like `Median House Price` or `Unit Sales Volume` and see predictions based on both Linear Regression and Decision Tree models.
+- **Population Comparison**: This section allows users to view population growth in the City of Boroondara alongside specific suburbs, aiding in demographic trend analysis.
+- **Custom Predictions**: Users can select options for year, property type (house or unit), transaction type (buy or rent), and value type (price or count) to generate custom predictions, displayed dynamically on the page.
+
+#### **3. RecentlySold Component**
+The `RecentlySold.js` component shows a table of recently sold properties, including data on address, property type, bedrooms, bathrooms, sale price, and date sold. 
+
+Features include:
+- **Sorting by Date**: Users can sort listings by the date sold, allowing them to see the most recent transactions.
+- **Responsive Table**: The table automatically adjusts for different screen sizes, ensuring a user-friendly experience on both desktop and mobile devices.
+
+### **Frontend Setup Instructions**
+
+#### **1. Install Dependencies**
+Navigate to the frontend directory and install the necessary dependencies by running:
+
+```bash
+npm install
+```
+
+#### **2. Run the Frontend**
+To start the frontend, use the following command:
+
+```bash
+npm start
+```
+
+This will launch the frontend at `http://localhost:3000`.
