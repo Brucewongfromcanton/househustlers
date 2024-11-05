@@ -86,50 +86,7 @@ const HomePage = () => {
 
       <Box sx={{ paddingY: 8, paddingX: 3, backgroundColor: '#1c1c1c' }}>
         <Container maxWidth="lg">
-          {/* About Us Section */}
           <section style={{ paddingBottom: '4rem' }}>
-            <Typography variant="h3" align="center" gutterBottom>
-              About Us
-            </Typography>
-            <Typography variant="body1" align="center" paragraph>
-              We are a passionate team dedicated to building innovative solutions in the real estate industry.
-              Our goal is to make housing information accessible and valuable for all.
-            </Typography>
-            <Grid container spacing={4} justifyContent="center">
-              <Grid item xs={12} sm={6} md={4}>
-                <Card sx={{ boxShadow: 3, '&:hover': { boxShadow: 6 }, backgroundColor: 'background.paper' }}>
-                  <CardMedia component="img" alt="Team Member 1" height="300" image={teamPhoto1} />
-                  <CardContent>
-                    <Typography variant="h5">Team Member 1</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Short description about Team Member 1, their role, and background.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Card sx={{ boxShadow: 3, '&:hover': { boxShadow: 6 }, backgroundColor: 'background.paper' }}>
-                  <CardMedia component="img" alt="Team Member 2" height="300" image={teamPhoto2} />
-                  <CardContent>
-                    <Typography variant="h5">Team Member 2</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Short description about Team Member 2, their role, and background.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-              <Grid item xs={12} sm={6} md={4}>
-                <Card sx={{ boxShadow: 3, '&:hover': { boxShadow: 6 }, backgroundColor: 'background.paper' }}>
-                  <CardMedia component="img" alt="Team Member 3" height="300" image={teamPhoto3} />
-                  <CardContent>
-                    <Typography variant="h5">Team Member 3</Typography>
-                    <Typography variant="body2" color="text.secondary">
-                      Short description about Team Member 3, their role, and background.
-                    </Typography>
-                  </CardContent>
-                </Card>
-              </Grid>
-            </Grid>
             {/* Map Image Section */}
             <Box sx={{ marginTop: 4, textAlign: 'center' }}>
               <Typography variant="h5" gutterBottom>
@@ -163,7 +120,17 @@ const HomePage = () => {
                 <Typography variant="h5" gutterBottom color="white">
                   Custom Prediction
                 </Typography>
-                <TextField label="Year" value={year} onChange={(e) => setYear(e.target.value)} type="number" fullWidth margin="normal" />
+                <TextField
+        label="Year"
+        type="number"
+        value={year}
+        onChange={(e) => setYear(e.target.value)}
+        inputProps={{ min: 2024, max: 2050 }}  // Enforce the year range
+        placeholder="2024-2050"                 // Show range as placeholder
+        helperText="Enter a year between 2024 and 2050"  // Additional guidance
+        fullWidth
+        margin="normal"
+      />
                 <FormControl fullWidth sx={{ my: 2 }}>
                   <InputLabel>Property Type</InputLabel>
                   <Select value={propertyType} onChange={(e) => setPropertyType(e.target.value)}>

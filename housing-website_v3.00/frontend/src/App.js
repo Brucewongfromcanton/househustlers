@@ -6,6 +6,7 @@ import { createTheme, ThemeProvider } from '@mui/material/styles';
 import HomePage from './Homepage';
 import RecentlySold from './RecentlySold';
 import Header from './Header';
+import AboutMe from './AboutMe'
 
 const theme = createTheme({
   palette: {
@@ -55,6 +56,7 @@ function App() {
         <Routes>
           <Route path="/" element={<HomePage />} />
           <Route path="/recently-sold" element={<RecentlySold />} />
+          <Route path="/about" element={<AboutMe />} />
         </Routes>
       </Router>
     </ThemeProvider>

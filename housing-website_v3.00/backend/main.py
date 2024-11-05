@@ -3,6 +3,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from pydantic import BaseModel
 from model import CombinedModel  # Import from model.py
 import pandas as pd
+from pydantic import BaseModel, Field  # Field for setting constraints
 
 app = FastAPI()
 
@@ -56,7 +57,7 @@ async def get_recently_sold_listings():
     
 # Custom prediction request model
 class CustomPredictionRequest(BaseModel):
-    year: int
+    year: int = Field(..., ge=2024, le=2050)  # Ensures year is between 2024 and 2050
     property_type: str  # "house" or "unit"
     transaction_type: str  # "buy" or "rent"
     value_type: str  # "price" or "count"
