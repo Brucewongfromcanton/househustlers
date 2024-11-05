@@ -1,11 +1,12 @@
 # House Hustlers
 
-Our group - **House Hustlers**, has been working on a machine model aimed to leverage historical housing market data and population datasets to predict future trends and fluctuations in the real estate market in the **City of Boroondara**. 
+Our team, **House Hustlers**, has developed an end-to-end solution that combines machine learning with web development to predict future trends and fluctuations in the **City of Boroondara** real estate market.
 
-This is a **Python machine learning program** using *pandas*, *scikit-learn* & *matplotlib*. By Analysing key variables such as property prices, demographic shifts, and population growth patterns, this program seeks to provide valuable insight for stakeholders, including potential homebuyers, investors, and policy makers. 
+This project integrates a **Python-based machine learning model**—built with *pandas*, *scikit-learn*, and *matplotlib*—with a dynamic **React.js frontend** and a **FastAPI backend**. By analyzing historical housing data, demographic changes, and population growth, we aim to deliver actionable insights for a wide range of stakeholders, including homebuyers, investors, urban planners, and policymakers.
 
-The ultimate goal is to forecast future changes in the housing market, helping to inform strategic decisions and improve planning in the real estate industry.
+The backend API, developed with FastAPI, serves as a bridge between the machine learning models and the frontend interface, enabling users to easily generate predictions based on real data. The React frontend presents these predictions through interactive charts and tables, providing a seamless and user-friendly experience.
 
+Through this platform, our goal is to make predictive analytics accessible and insightful for anyone looking to understand or make strategic decisions in the real estate market. This project not only provides valuable forecasting tools but also demonstrates the power of combining data science with web technology to create a comprehensive solution.
 ## Authors:
 | Name | Student ID |
 | ----- | ---- | 
