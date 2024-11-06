@@ -53,11 +53,11 @@ function App() {
     <ThemeProvider theme={theme}>
       <Router>
         <Header /> {/* Including the header with navigation links */}
-        <Routes>
-          <Route path="/" element={<HomePage />} />
-          <Route path="/recently-sold" element={<RecentlySold />} />
-          <Route path="/about" element={<AboutMe />} />
-        </Routes>
+          <Routes>
+            <Route path="/" element={<HomePage />} />
+            <Route path="/recently-sold" element={<RecentlySold />} />
+            <Route path="/about" element={<AboutMe />} />
+          </Routes>       
       </Router>
     </ThemeProvider>
   );
